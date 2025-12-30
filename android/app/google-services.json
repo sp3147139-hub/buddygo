@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "553672652524",
+    "project_id": "suhas-a7df7",
+    "storage_bucket": "suhas-a7df7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:553672652524:android:f5b1e75a2ddc0096bf17c9",
+        "android_client_info": {
+          "package_name": "com.example.suhas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLC-xT8omofq6UmTz-Lx_y1UqniJw9x-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
