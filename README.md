@@ -1,4 +1,4 @@
-# suhas
+# BuddyGo
 
 A new Flutter project.
 
