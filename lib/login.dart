@@ -1,5 +1,6 @@
 // lib/login.dart
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'home.dart';
 import 'signup.dart';
 import 'forgot_password.dart';
@@ -52,26 +53,76 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Logging in...'),
-          duration: Duration(seconds: 1),
-        ),
-      );
+      try {
+        // Sign in with Firebase Authentication
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
 
-      // Simulate network call
-      await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) return;
 
-      if (!mounted) return;
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login successful!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 1),
+          ),
+        );
 
-      setState(() {
-        _isLoading = false;
-      });
+        // Navigate to Home screen
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (!mounted) return;
 
-      // Navigate to Home screen
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } on FirebaseAuthException catch (e) {
+        String errorMessage;
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'No user found with this email';
+            break;
+          case 'wrong-password':
+            errorMessage = 'Incorrect password';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Invalid email address';
+            break;
+          case 'user-disabled':
+            errorMessage = 'This account has been disabled';
+            break;
+          case 'invalid-credential':
+            errorMessage = 'Invalid email or password';
+            break;
+          default:
+            errorMessage = 'Login failed: ${e.message}';
+        }
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An error occurred: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
   }
 
@@ -114,24 +165,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFE67E40),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.explore,
-                                color: Colors.white,
-                                size: 28,
+                            ClipOval(
+                              child: Image.asset(
+                                'assets/icon/BuddyGo.png',
+                                width: 55,
+                                height: 55,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 15),
                             const Text(
-                              'Nomad\'s Compass',
+                              'BuddyGo',
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 40,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF2D4A3A),
                               ),
