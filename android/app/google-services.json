@@ -12,7 +12,12 @@
           "package_name": "com.example.suhas"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "553672652524-p9clsbuuh7kacflv02u05u3tr0n4p3o5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCLC-xT8omofq6UmTz-Lx_y1UqniJw9x-w"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "553672652524-p9clsbuuh7kacflv02u05u3tr0n4p3o5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
