@@ -1,6 +1,7 @@
 // lib/signup.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'phone_verification_screen.dart';
 import 'login.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -59,80 +60,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _handleSignUp() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        // Create user with Firebase Authentication
-        UserCredential userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-
-        // Update display name
-        await userCredential.user?.updateDisplayName(_nameController.text.trim());
-
-        if (!mounted) return;
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account created successfully!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+      // Just navigate to phone verification with data (no Firebase call yet)
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PhoneVerificationScreen(
+            fullName: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
           ),
-        );
-
-        // Navigate back to login
-        await Future.delayed(const Duration(milliseconds: 500));
-        if (!mounted) return;
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      } on FirebaseAuthException catch (e) {
-        String errorMessage;
-        switch (e.code) {
-          case 'weak-password':
-            errorMessage = 'The password provided is too weak';
-            break;
-          case 'email-already-in-use':
-            errorMessage = 'An account already exists for this email';
-            break;
-          case 'invalid-email':
-            errorMessage = 'Invalid email address';
-            break;
-          default:
-            errorMessage = 'Sign up failed: ${e.message}';
-        }
-
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('An error occurred: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
+        ),
+      );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

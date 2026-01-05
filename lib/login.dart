@@ -1,6 +1,8 @@
 // lib/login.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'profile_setup_screen.dart';
 import 'home.dart';
 import 'signup.dart';
 import 'forgot_password.dart';
@@ -55,12 +57,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         // Sign in with Firebase Authentication
+        UserCredential userCredential =
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
 
         if (!mounted) return;
+
+        // Check if profile is completed
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+
+        if (!mounted) return;
+
+        final profileCompleted = userDoc.data()?['profileCompleted'] ?? false;
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,13 +84,19 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
 
-        // Navigate to Home screen
         await Future.delayed(const Duration(milliseconds: 500));
         if (!mounted) return;
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
+        // Navigate based on profile completion status
+        if (profileCompleted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        } else {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const ProfileSetupScreen()),
+          );
+        }
       } on FirebaseAuthException catch (e) {
         String errorMessage;
         switch (e.code) {
@@ -125,6 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
